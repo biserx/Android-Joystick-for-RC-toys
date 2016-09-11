@@ -68,6 +68,28 @@ public class JoystickActivity extends Activity {
 	int CONTROL_RIGHT_X;
 	int CONTROL_RIGHT_Y;
 
+	public enum StickPosition {
+		UpLeft(0),
+		UpCenter(1),
+		UpRight(2),
+		CenterLeft(3),
+		CenterCenter(4),
+		CenterRight(5),
+		DownLeft(6),
+		DownCenter(7),
+		DownRight(8);
+		final int value;
+		StickPosition(int value) {
+			this.value = value;
+		}
+		int getPositionX() {
+			return value % 3;
+		}
+		int getPositionY() {
+			return value / 3;
+		}
+	}
+
 	public int getCONTROL_MIN() {
 		return CONTROL_MIN;
 	}
@@ -90,6 +112,13 @@ public class JoystickActivity extends Activity {
 
 	public int getCONTROL_RIGHT_Y() {
 		return CONTROL_RIGHT_Y;
+	}
+
+	StickPosition leftStick = StickPosition.CenterCenter;
+	StickPosition rightStick = StickPosition.CenterCenter;
+	public void configureSticks(StickPosition leftStick, StickPosition rightStick) {
+		this.leftStick = leftStick;
+		this.rightStick = rightStick;
 	}
 
 	@Override
@@ -132,10 +161,10 @@ public class JoystickActivity extends Activity {
 
 			JOYSTICK_SEPARATOR_LINE_POSITION = layout.getWidth() / 2;
 
-			LEFT_JOYSTICK_DEFAULT_X = layout.getWidth() / 4;
-			LEFT_JOYSTICK_DEFAULT_Y = layout.getHeight() / 2;
-			RIGHT_JOYSTICK_DEFAULT_X = layout.getWidth() * 3 / 4;
-			RIGHT_JOYSTICK_DEFAULT_Y = layout.getHeight() / 2;
+			LEFT_JOYSTICK_DEFAULT_X = leftStick.getPositionX() * layout.getWidth() / 4;
+			LEFT_JOYSTICK_DEFAULT_Y = leftStick.getPositionY() * layout.getHeight() / 2;
+			RIGHT_JOYSTICK_DEFAULT_X = layout.getWidth() / 2 + rightStick.getPositionX() * layout.getWidth() / 4;
+			RIGHT_JOYSTICK_DEFAULT_Y = rightStick.getPositionY() * layout.getHeight() / 2;
 
 			JOYSTICK_LEFT_X = LEFT_JOYSTICK_DEFAULT_X;
 			JOYSTICK_LEFT_Y = LEFT_JOYSTICK_DEFAULT_Y;

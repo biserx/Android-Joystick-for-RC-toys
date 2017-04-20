@@ -36,10 +36,9 @@ public class WiFi_UDP extends CommunicationLink {
             }
         }
 
-        int i = 0;
         byte[] _data = new byte[data.length];
-        for (Byte b : data) {
-            _data[i++] = b;
+        for (int i = 0; i < data.length; i++) {
+            _data[i] = data[i];
         }
 
         DatagramPacket sendPacket = new DatagramPacket(_data, _data.length, IPAddress, serverPort);

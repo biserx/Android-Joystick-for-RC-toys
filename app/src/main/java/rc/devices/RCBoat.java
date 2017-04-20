@@ -10,7 +10,7 @@ public class RCBoat extends Device {
     private final String SERVER_IP = "192.168.4.1";
     private final int SERVER_PORT = 80;
 
-    private final long transmitInterval = 100;
+    private final long transmitInterval = 20;
 
     private final int THROTTLE_NEUTRAL = 0;
     private final int THROTTLE_MAX = 255;
@@ -24,11 +24,8 @@ public class RCBoat extends Device {
     private float min_steer_left, max_steer_left, min_steer_right, max_steer_right;
 
     private byte setBitsAsUnsignedByte(int x) {
-        if (x > 255)
-            return (byte) 0;
-        if (x > 127)
-            x = x - 256;
-        return (byte) x;
+        byte b = (byte) x;
+        return (byte) (b & 0xFF);
     }
 
     public RCBoat(Joystick joystick) {
@@ -36,6 +33,7 @@ public class RCBoat extends Device {
 
         WiFi_UDP link = new WiFi_UDP(this, SERVER_IP, SERVER_PORT);
         link.setTransmitIntervalMs(transmitInterval);
+        link.disableRedundantData();
         setCommunicationLink(link);
 
         joystick.getStickLeft().setDefaultPosition(Thumb.ThumbPosition.CenterCenter);
@@ -56,8 +54,6 @@ public class RCBoat extends Device {
         min_steer_right = joystick_control_center + joystick_control_range / 4;
         max_steer_right = joystick_control_center + joystick_control_range / 2;
     }
-
-    byte[] data = new byte[5];
 
     @Override
     public Byte[] getData() {
@@ -107,7 +103,8 @@ public class RCBoat extends Device {
         sendData[1] = setBitsAsUnsignedByte(throttle);
         sendData[2] = setBitsAsUnsignedByte(courseA);
         sendData[3] = setBitsAsUnsignedByte(courseB);
-        sendData[4] = setBitsAsUnsignedByte((data[0] + data[1] + data[2] + data[3]) % 255);
+        sendData[4] = setBitsAsUnsignedByte((rudder + throttle + courseA + courseB) % 255);
+
 
         return sendData;
     }

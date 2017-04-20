@@ -49,6 +49,7 @@ public class RCAirplane extends Device {
 
         WiFi_UDP link = new WiFi_UDP(this, SERVER_IP, SERVER_PORT);
         link.setTransmitIntervalMs(transmitInterval);
+        link.disableRedundantData();
         setCommunicationLink(link);
 
         joystick.getStickLeft().setDefaultPosition(Thumb.ThumbPosition.BottomCenter);
@@ -142,7 +143,7 @@ public class RCAirplane extends Device {
         // Log.d("Sending data:", String.valueOf(throttle) + "  /  " + String.valueOf(rudder) + "  /  " + String.valueOf(elevator) + "  /  " + String.valueOf(ailerons));
 
         // Repack data for return
-        Byte[] sendData = new Byte[data.length * Short.SIZE];
+        Byte[] sendData = new Byte[data.length * Short.SIZE / Byte.SIZE];
 
         // Convert short array to byte array
         sendData[0] = getShortBytesBE(data[0])[0];

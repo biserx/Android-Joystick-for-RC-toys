@@ -26,7 +26,7 @@ public abstract class CommunicationLink implements Runnable {
         transmitRedundantData = true;
     }
     public void disableRedundantData() {
-        transmitRedundantData = true;
+        transmitRedundantData = false;
     }
 
     // Overwrite this function in device implementation

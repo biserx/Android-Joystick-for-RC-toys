@@ -19,6 +19,11 @@ public abstract class CommunicationLink implements Runnable {
         transmitIntervalMs = mills;
     }
 
+    long lastTransmission = 0;
+    long keepAliveIntervalMs = 900;
+    public void setKeepAliveIntervalMs(long mills) {
+        keepAliveIntervalMs = mills;
+    }
 
     boolean transmitRedundantData = false;
 
@@ -59,12 +64,22 @@ public abstract class CommunicationLink implements Runnable {
                 }
             }
 
+            if (!proceedWithTransmission) {
+                if (System.currentTimeMillis() - lastTransmission > keepAliveIntervalMs) {
+                    if (oldData != null) {
+                        proceedWithTransmission = true;
+                        data = oldData;
+                    }
+                }
+            }
+
             if (proceedWithTransmission) {
                 try {
                     transmitData(data);
                 } catch (Exception e) {
                     break;
                 }
+                lastTransmission = System.currentTimeMillis();
             }
 
             try {

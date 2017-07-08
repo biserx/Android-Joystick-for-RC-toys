@@ -16,7 +16,7 @@ import rc.devices.RCBoat;
 
 public class MainActivity extends Activity {
 
-    public static String DEVICE = "device";
+    public static String DEVICE = "controlledDevice";
 
     final HashMap<String, Class<?>> devices = new HashMap<>();
 
@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
 
         // v Add your implementations here v
         devices.put("RC Boat (ESP8266)", RCBoat.class);
-        devices.put("RC Airplane (ESP8266)", RCAirplane.class);
+        //devices.put("RC Airplane (ESP8266)", RCAirplane.class);
         // ^ Add your implementations here ^
         addButtons();
     }

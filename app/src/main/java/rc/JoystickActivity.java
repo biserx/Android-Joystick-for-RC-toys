@@ -34,7 +34,8 @@ public class JoystickActivity extends Activity {
 	private int leftPadId = -1;
 	private int rightPadId = -1;
 
-	Thread communicationThread = null;
+	private Device controlledDevice = null;
+	private Thread communicationThread = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,8 +53,7 @@ public class JoystickActivity extends Activity {
 			Class<?> clazz = (Class<?>) getIntent().getExtras().get(MainActivity.DEVICE);
 			Constructor<?> constructor = clazz.getConstructor(Joystick.class);
 			Object instance = constructor.newInstance(joystick);
-            Device device = (Device) instance;
-			communicationThread = new Thread(device.getCommunicationLink());
+            controlledDevice = (Device) instance;
 		} catch (Exception e) {
 			e.printStackTrace();
 			finish();
@@ -69,7 +69,12 @@ public class JoystickActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		communicationThread.start();
+		if (controlledDevice != null) {
+			if (communicationThread == null || communicationThread.isInterrupted() || !communicationThread.isAlive()) {
+				communicationThread = new Thread(controlledDevice.getCommunicationLink());
+				communicationThread.start();
+			}
+		}
 	}
 
 	@Override
@@ -256,7 +261,7 @@ public class JoystickActivity extends Activity {
 		//paint.setColor(Color.argb(255, 150, 170, 170));
 		//c.drawRect(0, 0, w / 2, h, paint);
         paint.setColor(Color.argb(255, 150, 150, 150));
-        c.drawRect(0+ padSize/2, 0+ padSize/2, w/2- padSize/2, h- padSize/2, paint);
+        c.drawRect(0 + padSize/2, 0+ padSize/2, w/2- padSize/2, h- padSize/2, paint);
 
 
 		c.drawBitmap(joystick_bmp, padLeftX - padSize/2, padLeftY - padSize/2, null);
@@ -301,7 +306,5 @@ public class JoystickActivity extends Activity {
 		txtLeftJoystickStatus.setText(Math.round(cX1) + " x " + Math.round(cY1));
 		txtRightJoystickStatus.setText(Math.round(cX2) + " x " + Math.round(cY2));
 	}
-
-
 }
 

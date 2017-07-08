@@ -8,7 +8,7 @@ import rc.utils.Proportions;
 public class RCAirplane extends Device {
 
     // Configuration values
-    private final String SERVER_IP = "192.168.0.152"; // Hardcoded server IP
+    private final String SERVER_IP = "192.168.1.104"; // Hardcoded controller IP
     private final int SERVER_PORT = 8080; // Hardcoded port
 
     private final long transmitInterval = 20;
@@ -27,14 +27,14 @@ public class RCAirplane extends Device {
     private final int THROTTLE_MIN = 1100;
     private final int THROTTLE_MAX = 2000;
 
-    private final int AILERONS_MIN = 20;
-    private final int AILERONS_MAX = 160;
+    private final int AILERONS_MIN = 85;
+    private final int AILERONS_MAX = 105;
 
-    private final int ELEVATOR_MIN = 20;
-    private final int ELEVATOR_MAX = 160;
+    private final int ELEVATOR_MIN = 10;
+    private final int ELEVATOR_MAX = 110;
 
-    private final int RUDDER_MIN = 20;
-    private final int RUDDER_MAX = 160;
+    private final int RUDDER_MIN = 50;
+    private final int RUDDER_MAX = 90;
 
     // Function that returns byte values for given type
     private byte[] getShortBytesBE(short x) {
@@ -139,8 +139,6 @@ public class RCAirplane extends Device {
         data[2] = elevator;
         data[3] = ailerons;
         data[4] = (short) ((throttle + rudder + elevator + ailerons) % 747);
-
-        // Log.d("Sending data:", String.valueOf(throttle) + "  /  " + String.valueOf(rudder) + "  /  " + String.valueOf(elevator) + "  /  " + String.valueOf(ailerons));
 
         // Repack data for return
         Byte[] sendData = new Byte[data.length * Short.SIZE / Byte.SIZE];

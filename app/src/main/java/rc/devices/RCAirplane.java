@@ -1,5 +1,7 @@
 package rc.devices;
 
+import android.util.Log;
+
 import rc.joystick.Joystick;
 import rc.joystick.Thumb;
 import rc.communication.WiFi_UDP;
@@ -23,18 +25,21 @@ public class RCAirplane extends Device {
     private final int throttleIncrement = 30;
 
     private final int THROTTLE_OFF = 0;
-    private final int THROTTLE_ARM = 900;
-    private final int THROTTLE_MIN = 1100;
+    private final int THROTTLE_ARM = 1000;
+    private final int THROTTLE_MIN = 1000;
     private final int THROTTLE_MAX = 2000;
 
     private final int AILERONS_MIN = 85;
-    private final int AILERONS_MAX = 105;
+    private final int AILERONS_MID = 98;
+    private final int AILERONS_MAX = 115;
 
-    private final int ELEVATOR_MIN = 10;
-    private final int ELEVATOR_MAX = 110;
+    private final int ELEVATOR_MIN = 5;
+    private final int ELEVATOR_MID = 80;
+    private final int ELEVATOR_MAX = 140;
 
-    private final int RUDDER_MIN = 50;
-    private final int RUDDER_MAX = 90;
+    private final int RUDDER_MIN = 25;
+    private final int RUDDER_MID = 70;
+    private final int RUDDER_MAX = 110;
 
     // Function that returns byte values for given type
     private byte[] getShortBytesBE(short x) {
@@ -130,9 +135,10 @@ public class RCAirplane extends Device {
         }
 
         // Scaling values to our desired values
-        rudder = (short) Math.round(Proportions.linearProportion(jRudder, jMin, jMax, RUDDER_MIN, RUDDER_MAX));
-        elevator = (short) Math.round(Proportions.linearProportion(jElevator, jMin, jMax, ELEVATOR_MIN, ELEVATOR_MAX));
-        ailerons = (short) Math.round(Proportions.linearProportion(jAilerons, jMin, jMax, AILERONS_MIN, AILERONS_MAX));
+        rudder = (short) Math.round(Proportions.linearProportion(jRudder, jMin, jMax, RUDDER_MIN, RUDDER_MID, RUDDER_MAX));
+        elevator = (short) Math.round(Proportions.linearProportion(jElevator, jMin, jMax, ELEVATOR_MIN, ELEVATOR_MID, ELEVATOR_MAX));
+        ailerons = (short) Math.round(Proportions.linearProportion(jAilerons, jMin, jMax, AILERONS_MIN, AILERONS_MID, AILERONS_MAX));
+
 
         data[0] = throttle;
         data[1] = rudder;

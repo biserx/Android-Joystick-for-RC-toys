@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -125,42 +126,54 @@ public class JoystickActivity extends Activity {
 
     OnTouchListener controlsListener = new OnTouchListener() {
 		@Override
-		public boolean onTouch(View arg0, MotionEvent arg1) {
+		public boolean onTouch(View view, MotionEvent evet) {
 			if (!layoutInitialized) return false;
 
-			int pointerCount = arg1.getPointerCount();
-			int actionIndex = arg1.getActionIndex();
-			int pointerID = arg1.getPointerId(actionIndex);
-			int pID = arg1.findPointerIndex(actionIndex);
+
+            // READ THIS:
+            // https://stackoverflow.com/questions/13546376/how-to-use-multitouch-properly-purpose-of-motionevent-getactionindex
+            // https://stackoverflow.com/questions/4268426/android-difference-between-action-up-and-action-pointer-up#4269592
+            // https://android-developers.googleblog.com/2010/06/making-sense-of-multitouch.html
+
+
+			int pointerCount = evet.getPointerCount();
+			int actionIndex = evet.getActionIndex();
+			int pointerID = evet.getPointerId(actionIndex);
+			int pID = evet.findPointerIndex(actionIndex);
+
+
+			//Log.d("TOUCHD", "pointerCount: " + String.valueOf(pointerCount) + "    actionIndex: " + String.valueOf(actionIndex) +
+			//				"    pointerID: " + String.valueOf(pointerID) + "     pID: " + String.valueOf(pID));
+            //Log.d("Action", String.valueOf(evet.getActionMasked()));
 
 			try {
-				switch (arg1.getActionMasked()) {
+				switch (evet.getActionMasked()) {
 					case MotionEvent.ACTION_DOWN:
 					case MotionEvent.ACTION_POINTER_DOWN:
-						if (arg1.getX(pointerID) < layout.getWidth() / 2) {
+						if (evet.getX(pointerID) < layout.getWidth() / 2) {
 							if (leftPadId == -1) {
 								leftPadId = pID;
 								if (joystick.getStickLeft().isEnableXAxis()) {
-                                    padLeftX = arg1.getX(pointerID);
+                                    padLeftX = evet.getX(pointerID);
                                     if (padLeftX > layout.getWidth() / 2 - padSize / 2) padLeftX = layout.getWidth() / 2 - padSize / 2;
                                     if (padLeftX < padSize / 2) padLeftX = padSize / 2;
                                 } if (joystick.getStickLeft().isEnableYAxis()) {
-                                    padLeftY = arg1.getY(pointerID);
+                                    padLeftY = evet.getY(pointerID);
                                     if (padLeftY > layout.getHeight() - padSize / 2) padLeftY = layout.getHeight() - padSize / 2;
                                     if (padLeftY < padSize / 2) padLeftY = padSize / 2;
                                 }
 							}
 						}
-						if (arg1.getX(pointerID) > layout.getWidth() / 2) {
+						if (evet.getX(pointerID) > layout.getWidth() / 2) {
 							if (rightPadId == -1) {
 								rightPadId = pID;
 								if (joystick.getStickRight().isEnableXAxis()) {
-                                    padRightX = arg1.getX(pointerID);
+                                    padRightX = evet.getX(pointerID);
                                     if (padRightX > layout.getWidth() - padSize/2) padRightX = layout.getWidth() - padSize/2;
                                     if (padRightX < layout.getWidth() / 2 + padSize/2) padRightX = layout.getWidth() / 2 + padSize/2;
                                 }
 								if (joystick.getStickRight().isEnableYAxis()) {
-                                    padRightY = arg1.getY(pointerID);
+                                    padRightY = evet.getY(pointerID);
                                     if (padRightY > layout.getHeight() - padSize / 2) padRightY = layout.getHeight() - padSize / 2;
                                     if (padRightY < padSize / 2) padRightY = padSize / 2;
                                 }
@@ -169,26 +182,26 @@ public class JoystickActivity extends Activity {
 						break;
 					case MotionEvent.ACTION_MOVE:
 						for (int i = 0; i < pointerCount; i++) {
-							pID = arg1.getPointerId(i);
+							pID = evet.getPointerId(i);
 							if (leftPadId == pID) {
 								if (joystick.getStickLeft().isEnableXAxis()) {
-									padLeftX = arg1.getX(i);
+									padLeftX = evet.getX(i);
                                     if (padLeftX > layout.getWidth() / 2 - padSize / 2) padLeftX = layout.getWidth() / 2 - padSize / 2;
                                     if (padLeftX < padSize / 2) padLeftX = padSize / 2;
 								}
 								if (joystick.getStickLeft().isEnableYAxis()) {
-                                    padLeftY = arg1.getY(i);
+                                    padLeftY = evet.getY(i);
                                     if (padLeftY > layout.getHeight() - padSize / 2) padLeftY = layout.getHeight() - padSize / 2;
                                     if (padLeftY < padSize / 2) padLeftY = padSize / 2;
                                 }
 							} else if (rightPadId == pID) {
 								if (joystick.getStickRight().isEnableXAxis()) {
-									padRightX = arg1.getX(i);
+									padRightX = evet.getX(i);
                                     if (padRightX > layout.getWidth() - padSize/2) padRightX = layout.getWidth() - padSize/2;
                                     if (padRightX < layout.getWidth() / 2 + padSize/2) padRightX = layout.getWidth() / 2 + padSize/2;
 								}
 								if (joystick.getStickRight().isEnableYAxis()) {
-                                    padRightY = arg1.getY(i);
+                                    padRightY = evet.getY(i);
                                     if (padRightY > layout.getHeight() - padSize / 2) padRightY = layout.getHeight() - padSize / 2;
                                     if (padRightY < padSize / 2) padRightY = padSize / 2;
                                 }
@@ -196,8 +209,11 @@ public class JoystickActivity extends Activity {
 						}
 						break;
 					case MotionEvent.ACTION_UP:
+                        leftPadId = -1;
+                        rightPadId = -1;
+                        pID = -1;
 					case MotionEvent.ACTION_POINTER_UP:
-					case MotionEvent.ACTION_CANCEL:
+					//case MotionEvent.ACTION_CANCEL:
 						if (leftPadId == pID) {
 							leftPadId = -1;
 							if (joystick.getStickLeft().getResetToDefaultPosition() == Thumb.ResetToDefaultPosition.Both) {
@@ -208,7 +224,8 @@ public class JoystickActivity extends Activity {
 							} else if (joystick.getStickLeft().getResetToDefaultPosition() == Thumb.ResetToDefaultPosition.Y) {
 								padLeftY = padLeftDefaultY;
 							}
-						} else if (rightPadId == pID) {
+						}
+						if (rightPadId == pID) {
 							rightPadId = -1;
 							if (joystick.getStickRight().getResetToDefaultPosition() == Thumb.ResetToDefaultPosition.Both) {
 								padRightX = padRightDefaultX;
